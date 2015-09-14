@@ -92,23 +92,26 @@ class Controller(object):
         return "%d seconds ago" % timedelta.total_seconds()
 
 
-
-
 def print_usage():
-    print("Usage: controller.py -c PATH_TO_CONFIGURATION [-p http://proxyhost:port]")
+    print("Usage: controller.py -c PATH_TO_CONFIGURATION [--debug]")
 
 
 if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stdout, level=logging.WARN)
-
-    options, remainder = getopt.getopt(sys.argv[1:], 'c:p:', ['config=', 'proxy='])
+    debug = False
+    options, remainder = getopt.getopt(sys.argv[1:], 'c:', ['config=', 'debug'])
     config = None
     for o, a in options:
         if o in ('-c', '--config'):
             config = Configuration(a)
+        elif o == '--debug':
+            debug = True
 
     if config is None:
         print_usage()
         sys.exit(1)
 
+    if debug:
+        logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    else:
+        logging.basicConfig(stream=sys.stdout, level=logging.WARN)
     Controller(config).run_blocking()
