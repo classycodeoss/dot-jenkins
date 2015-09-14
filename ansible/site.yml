@@ -1,0 +1,15 @@
+- hosts: all
+  vars:
+    install_dir: "{{ ansible_env.HOME }}/dot-jenkins"
+  tasks:
+    - name: Ensure install directory exists
+      file: name={{ install_dir }} state=directory
+
+    - name: Copy stuff
+      copy: src={{ item }} dest={{ install_dir }}
+      with_fileglob:
+        - ../*.py
+        - ../configs/*.cfg
+
+    - name: Set executable bit on Python entrypoint
+      file: name={{ install_dir }}/controller.py state=file mode=a+rx

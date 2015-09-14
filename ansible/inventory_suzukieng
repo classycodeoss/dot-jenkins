@@ -1,0 +1,1 @@
+raspberrypi2    ansible_ssh_host=192.168.88.188     ansible_ssh_user=pi

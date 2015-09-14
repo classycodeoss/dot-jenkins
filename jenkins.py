@@ -1,12 +1,24 @@
 import requests
 import logging
+import datetime
+
+class BuildResult:
+    Failure, Unstable, Success, Other = range(4)
 
 
 class Build(object):
 
     def __init__(self, json_obj):
         self.display_name = json_obj['displayName']
-        self.result = json_obj['result']
+
+        if json_obj['result'] == 'SUCCESS':
+            self.result = BuildResult.Success
+        elif json_obj['result'] == 'FAILURE':
+            self.result = BuildResult.Failure
+        elif json_obj['result'] == 'UNSTABLE':
+            self.result = BuildResult.Unstable
+        else:
+            self.result = BuildResult.Other
         self.number = json_obj['number']
         self.timestamp = json_obj['timestamp']
 
@@ -43,13 +55,16 @@ class Job(object):
 
 class View(object):
 
-    def __init__(self, url):
+    def __init__(self, url, ssl_verify_certificates=True):
         self.url = url
+        self.name = None
         self.jobs = None
         self.num_failing_jobs = -1
         self.num_jobs = -1
         self.num_succeeding_jobs = -1
         self.last_build_for_job = None
+        self.ssl_verify_certificates = ssl_verify_certificates
+        self.last_update = None
 
     def refresh(self):
 
@@ -57,21 +72,23 @@ class View(object):
 
         # first, fetch the view itself, and obtain the list of job references
         logging.info('Fetching view from URL: ' + self.url)
-        resp_json = sess.get(self.url).json()
+        resp_json = sess.get(self.url, verify=self.ssl_verify_certificates).json()
         job_urls = [obj['url'] for obj in resp_json['jobs']]
+        self.name = resp_json['name']
 
         # now fetch all jobs in the view
         logging.info('Fetching Jobs from URLs: ' + str(job_urls))
-        self.jobs = [Job(sess.get(url + 'api/json').json()) for url in job_urls]
+        self.jobs = [Job(sess.get(url + 'api/json', verify=self.ssl_verify_certificates).json()) for url in job_urls]
 
         self.last_build_for_job = {}
         for job in self.jobs:
             if job.last_build_url is not None:
-                self.last_build_for_job[job.url] = Build(sess.get(job.last_build_url + 'api/json').json())
+                self.last_build_for_job[job.url] = Build(sess.get(job.last_build_url + 'api/json', verify=self.ssl_verify_certificates).json())
 
         self.num_jobs = len(self.jobs)
-        self.num_succeeding_jobs = len(filter(lambda build: build is not None and build.result == 'SUCCESS',
+        self.num_succeeding_jobs = len(filter(lambda build: build is not None and build.result == BuildResult.Success,
                                               [self.last_build_for_job.get(job.url, None) for job in self.jobs]))
-        self.num_failing_jobs = len(filter(lambda build: build is not None and build.result != 'SUCCESS',
+        self.num_failing_jobs = len(filter(lambda build: build is not None and build.result != BuildResult.Success,
                                            [self.last_build_for_job.get(job.url, None) for job in self.jobs]))
+        self.last_update = datetime.datetime.now()
 
