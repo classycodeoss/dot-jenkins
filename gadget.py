@@ -1,5 +1,9 @@
 class IndicatorStatus:
-    Off, FadeInOut, Blink, On = range(4)
+    On, Off = range(2)
+
+
+class BackgroundStatus:
+    Ok, Warn, Error, Info = range(4)
 
 
 class GadgetBase(object):
@@ -20,3 +24,12 @@ class GadgetBase(object):
             print('[%d] BLINK' % i)
         else:
             raise ValueError('Unsupported build indicator status')
+
+    def clear_build_indicators(self):
+        pass
+
+    def display_boot_animation(self):
+        pass
+
+    def set_background_status(self, status):
+        pass

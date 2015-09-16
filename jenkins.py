@@ -45,9 +45,9 @@ class Job(object):
             self.test_health_text = None
             self.test_health_score = None
 
-        if json_obj['lastBuild'] is not None:
-            self.last_build_url = json_obj['lastBuild']['url']
-            self.last_build_number = json_obj['lastBuild']['number']
+        if json_obj['lastCompletedBuild'] is not None:
+            self.last_build_url = json_obj['lastCompletedBuild']['url']
+            self.last_build_number = json_obj['lastCompletedBuild']['number']
         else:
             self.last_build_url = None
             self.last_build_number = None
@@ -62,6 +62,7 @@ class View(object):
         self.num_failing_jobs = -1
         self.num_jobs = -1
         self.num_succeeding_jobs = -1
+        self.num_unstable_jobs = -1
         self.last_build_for_job = None
         self.ssl_verify_certificates = ssl_verify_certificates
         self.last_update = None
@@ -88,7 +89,9 @@ class View(object):
         self.num_jobs = len(self.jobs)
         self.num_succeeding_jobs = len(filter(lambda build: build is not None and build.result == BuildResult.Success,
                                               [self.last_build_for_job.get(job.url, None) for job in self.jobs]))
-        self.num_failing_jobs = len(filter(lambda build: build is not None and build.result != BuildResult.Success,
+        self.num_failing_jobs = len(filter(lambda build: build is not None and build.result == BuildResult.Failure,
+                                           [self.last_build_for_job.get(job.url, None) for job in self.jobs]))
+        self.num_unstable_jobs = len(filter(lambda build: build is not None and build.result == BuildResult.Unstable,
                                            [self.last_build_for_job.get(job.url, None) for job in self.jobs]))
         self.last_update = datetime.datetime.now()
 

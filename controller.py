@@ -4,23 +4,18 @@ import getopt
 import json
 import logging
 import time
-import os
 import requests.exceptions
 import importlib
 import datetime
 
 import jenkins
 import gadget
+import sysutils
 
 __version__ = '1.0.0'
 
 
-def is_raspberrypi():
-    return os.uname()[4].startswith("arm")
-
-
 class Configuration(object):
-
     def __init__(self, path_to_config):
         logging.info("Reading configuration from path: %s" % path_to_config)
         config_fd = open(path_to_config)
@@ -36,12 +31,13 @@ class Configuration(object):
         if not self.ssl_verify_certificates:
             logging.warn("SSL certificate validation disabled via config")
             requests.packages.urllib3.disable_warnings()  # requests uses a bundled urllib3 module
+        self.network_interface_name = config_json.get('networkInterfaceName', None)
 
 
 class Controller(object):
     def __init__(self, config):
         self.config = config
-        if is_raspberrypi():
+        if sysutils.is_raspberrypi():
             self.gadget = importlib.import_module('dothatgadget').DotHatGadget()
         else:
             logging.warn('Not running on RaspberryPi, using dummy hardware')
@@ -54,6 +50,7 @@ class Controller(object):
             try:
                 view.refresh()
             except requests.exceptions.RequestException as e:
+                self.display_error(e)
                 logging.error("Failed to refresh view, will try again later: %s", e.message)
                 time.sleep(self.config.view_refresh_error_interval)
                 continue
@@ -63,15 +60,40 @@ class Controller(object):
 
             time.sleep(self.config.view_refresh_interval)
 
+    def display_error(self, e):
+        self.gadget.set_status_lines([
+            'Error encountered',
+            'while fetching.',
+            'Will try later.'
+        ])
+
+    def display_system_infos(self):
+        lines = [
+            'Version: %s' % __version__,
+            sysutils.get_ip_address(),
+            'Getting ready...'
+        ]
+        self.gadget.set_status_lines(lines)
+        self.gadget.display_boot_animation()
+
     def dislay_view_overview(self, view):
         lines = [
             view.name,
-            'S/F/T: %d/%d/%d' % (view.num_succeeding_jobs, view.num_failing_jobs, view.num_jobs),
+            'S/U/F: %d/%d/%d' % (view.num_succeeding_jobs, view.num_unstable_jobs, view.num_failing_jobs),
             self.get_last_updated_str(view.last_update)
         ]
         self.gadget.set_status_lines(lines)
 
+        # set mood depending on failed/unstable/successful jobs
+        if view.num_failing_jobs > 0:
+            self.gadget.set_background_status(gadget.BackgroundStatus.Error)
+        elif view.num_unstable_jobs > 0:
+            self.gadget.set_background_status(gadget.BackgroundStatus.Warn)
+        else:
+            self.gadget.set_background_status(gadget.BackgroundStatus.Ok)
+
         # update LED indicators for the first 6 jobs in the view
+        self.gadget.clear_build_indicators()
         for i in range(len(view.jobs)):
             job = view.jobs[i]
             last_build = view.last_build_for_job.get(job.url, None)
@@ -81,10 +103,10 @@ class Controller(object):
                 if last_build.result == jenkins.BuildResult.Success:
                     self.gadget.set_build_indicator(i, gadget.IndicatorStatus.On)
                 elif last_build.result == jenkins.BuildResult.Unstable:
-                    self.gadget.set_build_indicator(i, gadget.IndicatorStatus.On)
-                elif last_build.result == jenkins.BuildResult.Failure:
                     self.gadget.set_build_indicator(i, gadget.IndicatorStatus.Off)
                 elif last_build.result == jenkins.BuildResult.Unstable:
+                    self.gadget.set_build_indicator(i, gadget.IndicatorStatus.Off)
+                else:
                     self.gadget.set_build_indicator(i, gadget.IndicatorStatus.Off)
 
     def get_last_updated_str(self, last_update):
@@ -110,8 +132,11 @@ if __name__ == '__main__':
         print_usage()
         sys.exit(1)
 
+    logging.basicConfig(stream=sys.stdout, level=logging.WARN)
     if debug:
-        logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
-    else:
-        logging.basicConfig(stream=sys.stdout, level=logging.WARN)
-    Controller(config).run_blocking()
+        logging.getLogger().setLevel(logging.DEBUG)
+
+    controller = Controller(config)
+    controller.display_system_infos()
+    time.sleep(10)
+    controller.run_blocking()

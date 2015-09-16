@@ -1,4 +1,7 @@
-from gadget import GadgetBase, IndicatorStatus
+import math
+import time
+
+from gadget import GadgetBase, IndicatorStatus, BackgroundStatus
 from dothat import lcd
 from dothat import backlight
 
@@ -10,8 +13,25 @@ class DotHatGadget(GadgetBase):
     MIN_LED_BRIGHTNESS = 0
     MAX_LED_BRIGHTNESS = 255
 
+    NUM_LEDS = 6
+    ANIM_INTERVAL_SECONDS = 0.01
+
     def __init__(self):
         super(DotHatGadget, self).__init__()
+
+    def display_boot_animation(self, anim_time=10.0):
+        elapsed_time = 0.0
+        x = 0
+        start_time = time.
+        while True:
+            if elapsed_time >= anim_time:
+                break
+            x += 1
+            backlight.sweep((x % 360) / 360.0)
+            backlight.set_graph(abs(math.sin(x / 100.0)))
+            time.sleep(DotHatGadget.ANIM_INTERVAL_SECONDS)
+            elapsed_time += DotHatGadget.ANIM_INTERVAL_SECONDS
+
 
     def set_status_lines(self, lines):
         lcd.clear()
@@ -21,8 +41,20 @@ class DotHatGadget(GadgetBase):
 
     def set_build_indicator(self, i, status):
         if status == IndicatorStatus.On:
-            backlight.set(i, DotHatGadget.MAX_LED_BRIGHTNESS)
-        elif status == IndicatorStatus.Off:
-            backlight.set(i, DotHatGadget.MIN_LED_BRIGHTNESS)
+            backlight.graph_set_led_state(i, 1)
+        else:
+            backlight.graph_set_led_state(i, 0)
 
+    def clear_build_indicators(self):
+        for i in range(DotHatGadget.NUM_LEDS):
+            backlight.set_bar(i, DotHatGadget.MIN_LED_BRIGHTNESS)
 
+    def set_background_status(self, status):
+        if status == BackgroundStatus.Ok:
+            backlight.rgb(0, 255, 0)
+        elif status == BackgroundStatus.Error:
+            backlight.rgb(255, 0, 0)
+        elif status == BackgroundStatus.Warn:
+            backlight.rgb(255, 255, 0)
+        else:
+            backlight.rgb(0, 0, 255)
