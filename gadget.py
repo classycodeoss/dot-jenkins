@@ -28,7 +28,7 @@ class GadgetBase(object):
     def clear_build_indicators(self):
         pass
 
-    def display_boot_animation(self):
+    def display_boot_animation(self, anim_time=10.0):
         pass
 
     def set_background_status(self, status):

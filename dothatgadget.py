@@ -22,7 +22,6 @@ class DotHatGadget(GadgetBase):
     def display_boot_animation(self, anim_time=10.0):
         elapsed_time = 0.0
         x = 0
-        start_time = time.
         while True:
             if elapsed_time >= anim_time:
                 break
@@ -31,6 +30,8 @@ class DotHatGadget(GadgetBase):
             backlight.set_graph(abs(math.sin(x / 100.0)))
             time.sleep(DotHatGadget.ANIM_INTERVAL_SECONDS)
             elapsed_time += DotHatGadget.ANIM_INTERVAL_SECONDS
+        self.clear_build_indicators()
+        self.set_background_status(BackgroundStatus.Info)
 
 
     def set_status_lines(self, lines):
