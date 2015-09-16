@@ -54,6 +54,11 @@ class Controller(object):
                 logging.error("Failed to refresh view, will try again later: %s", e.message)
                 time.sleep(self.config.view_refresh_error_interval)
                 continue
+            except ValueError as e:
+                self.display_error(e)
+                logging.error("Failed to refresh view, will try again later: %s", e.message)
+                time.sleep(self.config.view_refresh_error_interval)
+                continue
 
             self.dislay_view_overview(view)
             # loop over the jobs
