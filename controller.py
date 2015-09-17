@@ -66,6 +66,7 @@ class Controller(object):
             time.sleep(self.config.view_refresh_interval)
 
     def display_error(self, e):
+        self.gadget.set_background_status(gadget.BackgroundStatus.Error)
         self.gadget.set_status_lines([
             'Error encountered',
             'while fetching.',
@@ -115,8 +116,10 @@ class Controller(object):
                     self.gadget.set_build_indicator(i, gadget.IndicatorStatus.Off)
 
     def get_last_updated_str(self, last_update):
-        timedelta = datetime.datetime.now() - last_update
-        return "%d seconds ago" % timedelta.total_seconds()
+        now_datetime = datetime.datetime.now()
+        #timedelta = now_datetime - last_update
+        # TODO: as soon as we refresh constantly, show something like '5 seconds ago...'
+        return "@ %s" % now_datetime.strftime('%H:%M:%S')
 
 
 def print_usage():

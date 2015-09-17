@@ -17,6 +17,9 @@
     - name: Install configuration
       template: src={{ controller_config }} dest=/etc/dot-jenkins.cfg
 
+    - name: Ensure needed Python libs are present
+      pip: name=requests state=present
+
     - name: Ensure supervisor package is installed
       apt: name=supervisor state=present
 
