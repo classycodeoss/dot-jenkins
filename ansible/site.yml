@@ -3,6 +3,9 @@
   vars:
     install_dir: "/opt/dot-jenkins"
   tasks:
+    - name: Disable power management for Edimax WLAN dongle
+      copy: src=../etc/8192cu.conf dest=/etc/modprobe.d/8192cu.conf
+
     - name: Ensure install directory exists
       file: name={{ install_dir }} state=directory
 
