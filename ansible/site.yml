@@ -1,6 +1,7 @@
 - hosts: all
+  sudo: true
   vars:
-    install_dir: "{{ ansible_env.HOME }}/dot-jenkins"
+    install_dir: "/opt/dot-jenkins"
   tasks:
     - name: Ensure install directory exists
       file: name={{ install_dir }} state=directory
@@ -9,7 +10,18 @@
       copy: src={{ item }} dest={{ install_dir }}
       with_fileglob:
         - ../*.py
-        - ../configs/*.cfg
 
     - name: Set executable bit on Python entrypoint
       file: name={{ install_dir }}/controller.py state=file mode=a+rx
+
+    - name: Install configuration
+      template: src={{ controller_config }} dest=/etc/dot-jenkins.cfg
+
+    - name: Ensure supervisor package is installed
+      apt: name=supervisor state=present
+
+    - name: Install supervisord.conf
+      template: src=../etc/supervisord.conf dest=/etc/supervisor/conf.d/dot-jenkins-supervisord.conf
+
+    - name: Restart supervisord
+      service: name=supervisor state=restarted
