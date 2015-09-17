@@ -47,8 +47,7 @@ class DotHatGadget(GadgetBase):
             backlight.graph_set_led_state(i, 0)
 
     def clear_build_indicators(self):
-        for i in range(DotHatGadget.NUM_LEDS):
-            backlight.set_bar(i, DotHatGadget.MIN_LED_BRIGHTNESS)
+        backlight.graph_off()
 
     def set_background_status(self, status):
         if status == BackgroundStatus.Ok:
