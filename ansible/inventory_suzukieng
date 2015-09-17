@@ -1,4 +1,7 @@
+[suzukieng]
 raspberrypi2    ansible_ssh_host=192.168.88.188     ansible_ssh_user=pi     controller_config=../configs/iam30.cfg
+
+[bluecare]
 bcraspi1        ansible_ssh_user=pi     ansible_ssh_pass=raspberry  controller_config=../configs/iam30.cfg
 bcraspi2        ansible_ssh_user=pi     ansible_ssh_pass=raspberry  controller_config=../configs/larnags.cfg
 bcraspi3        ansible_ssh_user=pi     ansible_ssh_pass=raspberry  controller_config=../configs/hinclient.cfg
