@@ -1,4 +1,5 @@
 venv
+configs/*.cfg
 .idea/workspace.xml
 .idea/tasks.xml
 
