@@ -1,3 +1,7 @@
+MAX_LINES = 3
+MAX_CHARS = 16
+MAX_INDICATORS = 6
+
 class IndicatorStatus:
     On, Off = range(2)
 
@@ -11,17 +15,19 @@ class GadgetBase(object):
         pass
 
     def set_status_lines(self, lines):
-        print("HW:set_status_lines:\n%s" % '\n'.join(lines))
+        print("HW:set_status_lines: %s" % '|'.join(lines))
 
     def set_build_indicator(self, i, status):
+        if i >= MAX_INDICATORS:
+            return
         if status == IndicatorStatus.Off:
-            print('[%d] OFF' % i)
+            print('HW:set_build_indicator [%d] OFF' % i)
         elif status == IndicatorStatus.On:
-            print('[%d] ON' % i)
+            print('HW:set_build_indicator [%d] ON' % i)
         elif status == IndicatorStatus.FadeInOut:
-            print('[%d] FADE' % i)
+            print('HW:set_build_indicator [%d] FADE' % i)
         elif status == IndicatorStatus.Blink:
-            print('[%d] BLINK' % i)
+            print('HW:set_build_indicator [%d] BLINK' % i)
         else:
             raise ValueError('Unsupported build indicator status')
 

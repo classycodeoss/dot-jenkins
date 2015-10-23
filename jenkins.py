@@ -87,11 +87,19 @@ class View(object):
                 self.last_build_for_job[job.url] = Build(sess.get(job.last_build_url + 'api/json', verify=self.ssl_verify_certificates).json())
 
         self.num_jobs = len(self.jobs)
-        self.num_succeeding_jobs = len(filter(lambda build: build is not None and build.result == BuildResult.Success,
-                                              [self.last_build_for_job.get(job.url, None) for job in self.jobs]))
-        self.num_failing_jobs = len(filter(lambda build: build is not None and build.result == BuildResult.Failure,
-                                           [self.last_build_for_job.get(job.url, None) for job in self.jobs]))
-        self.num_unstable_jobs = len(filter(lambda build: build is not None and build.result == BuildResult.Unstable,
-                                           [self.last_build_for_job.get(job.url, None) for job in self.jobs]))
+        self.num_succeeding_jobs = len(self.succeeding_jobs())
+        self.num_failing_jobs = len(self.failing_jobs())
+        self.num_unstable_jobs = len(self.unstable_jobs())
         self.last_update = datetime.datetime.now()
 
+    def failing_jobs(self):
+        return filter(lambda x: x[1] is not None and x[1].result == BuildResult.Failure,
+                      [(job, self.last_build_for_job.get(job.url, None)) for job in self.jobs])
+
+    def unstable_jobs(self):
+        return filter(lambda x: x[1] is not None and x[1].result == BuildResult.Unstable,
+                      [(job, self.last_build_for_job.get(job.url, None)) for job in self.jobs])
+
+    def succeeding_jobs(self):
+        return filter(lambda x: x[1] is not None and x[1].result == BuildResult.Success,
+                      [(job, self.last_build_for_job.get(job.url, None)) for job in self.jobs])
