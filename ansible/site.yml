@@ -23,6 +23,9 @@
     - name: Install updater script
       copy: src=../updater/update-dot-jenkins.sh dest=/usr/local/bin/update-dot-jenkins.sh mode=a+rx
 
+    - name: Register updater cronjob
+      cron: name="run dot-jenkins updater" special_time=reboot job="/usr/local/bin/update-dot-jenkins.sh >/var/log/update-dot-jenkins.log 2>&1"
+
     - name: Ensure needed Python libs are present
       pip: name=requests state=present
 

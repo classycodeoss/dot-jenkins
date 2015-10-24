@@ -163,12 +163,10 @@ class Controller(object):
             try:
                 view.refresh()
             except requests.exceptions.RequestException as e:
-                self.display_error(e)
                 logging.error("Failed to refresh view, will try again later: %s", e.message)
                 time.sleep(self.config.view_refresh_error_interval)
                 continue
             except ValueError as e:
-                self.display_error(e)
                 logging.error("Failed to refresh view, will try again later: %s", e.message)
                 time.sleep(self.config.view_refresh_error_interval)
                 continue
@@ -179,14 +177,6 @@ class Controller(object):
             # and sleep until the next iteration
             time.sleep(self.config.view_refresh_interval)
 
-    def display_error(self, e):
-        self.gadget.set_background_status(gadget.BackgroundStatus.Error)
-        self.gadget.set_status_lines([
-            'Error encountered',
-            'while fetching.',
-            'Will try later.'
-        ])
-
     def display_system_infos(self):
         lines = [
             'Version: %s' % __version__,
@@ -195,8 +185,6 @@ class Controller(object):
         ]
         self.gadget.set_status_lines(lines)
         self.gadget.display_boot_animation()
-
-
 
 
 def print_usage():
@@ -217,7 +205,9 @@ if __name__ == '__main__':
         print_usage()
         sys.exit(1)
 
-    logging.basicConfig(stream=sys.stdout, level=logging.WARN)
+    logging.basicConfig(stream=sys.stdout, level=logging.WARN,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        datefmt='YYYY-MM-DDTHH:mm:ss.SSSZ')
     if debug:
         logging.getLogger().setLevel(logging.DEBUG)
 
