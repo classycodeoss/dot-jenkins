@@ -55,7 +55,7 @@ class Job(object):
 
 class View(object):
 
-    def __init__(self, url, ssl_verify_certificates=True):
+    def __init__(self, url, username=None, auth_token=None, ssl_verify_certificates=True):
         self.url = url
         self.name = None
         self.jobs = None
@@ -66,10 +66,13 @@ class View(object):
         self.last_build_for_job = None
         self.ssl_verify_certificates = ssl_verify_certificates
         self.last_update = None
+        self.username = username
+        self.auth_token = auth_token
 
     def refresh(self):
-
         sess = requests.Session()
+        if self.username is not None and self.auth_token is not None:
+            sess.auth = (self.username, self.auth_token)
 
         # first, fetch the view itself, and obtain the list of job references
         logging.info('Fetching view from URL: ' + self.url)

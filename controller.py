@@ -34,6 +34,8 @@ class Configuration(object):
             requests.packages.urllib3.disable_warnings()  # requests uses a bundled urllib3 module
         self.network_interface_name = config_json.get('networkInterfaceName', None)
         self.display_update_interval = config_json.get('displayUpdateInterval', 5.0)
+        self.username = config_json.get('username', None)
+        self.auth_token = config_json.get('authToken', None)
 
 
 class ViewState(object):
@@ -159,7 +161,8 @@ class Controller(object):
     def run_blocking(self):
         self.render_thread.start()
         while True:
-            view = jenkins.View(self.config.view_url, ssl_verify_certificates=self.config.ssl_verify_certificates)
+            view = jenkins.View(self.config.view_url, username=self.config.username, auth_token=self.config.auth_token,
+                                ssl_verify_certificates=self.config.ssl_verify_certificates)
             try:
                 view.refresh()
             except requests.exceptions.RequestException as e:
