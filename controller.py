@@ -92,27 +92,19 @@ class RenderThread(threading.Thread):
         # set mood depending on failed/unstable/successful jobs
         if view.num_failing_jobs > 0:
             self.gadget.set_background_status(gadget.BackgroundStatus.Error)
+            self.gadget.set_indicator(0, gadget.IndicatorStatus.Off)
+            self.gadget.set_indicator(1, gadget.IndicatorStatus.Off)
+            self.gadget.set_indicator(2, gadget.IndicatorStatus.On)
         elif view.num_unstable_jobs > 0:
             self.gadget.set_background_status(gadget.BackgroundStatus.Warn)
+            self.gadget.set_indicator(0, gadget.IndicatorStatus.Off)
+            self.gadget.set_indicator(1, gadget.IndicatorStatus.On)
+            self.gadget.set_indicator(2, gadget.IndicatorStatus.On)
         else:
             self.gadget.set_background_status(gadget.BackgroundStatus.Ok)
-
-        # update LED indicators for the first 6 jobs in the view
-        self.gadget.clear_build_indicators()
-        for i in range(len(view.jobs)):
-            job = view.jobs[i]
-            last_build = view.last_build_for_job.get(job.url, None)
-            if last_build is None:
-                self.gadget.set_build_indicator(i, gadget.IndicatorStatus.Off)
-            else:
-                if last_build.result == jenkins.BuildResult.Success:
-                    self.gadget.set_build_indicator(i, gadget.IndicatorStatus.On)
-                elif last_build.result == jenkins.BuildResult.Unstable:
-                    self.gadget.set_build_indicator(i, gadget.IndicatorStatus.Off)
-                elif last_build.result == jenkins.BuildResult.Unstable:
-                    self.gadget.set_build_indicator(i, gadget.IndicatorStatus.Off)
-                else:
-                    self.gadget.set_build_indicator(i, gadget.IndicatorStatus.Off)
+            self.gadget.set_indicator(0, gadget.IndicatorStatus.On)
+            self.gadget.set_indicator(1, gadget.IndicatorStatus.On)
+            self.gadget.set_indicator(2, gadget.IndicatorStatus.On)
 
     def display_failed_job(self, job_and_build):
         job, build = job_and_build

@@ -27,10 +27,9 @@ class DotHatGadget(GadgetBase):
                 break
             x += 1
             backlight.sweep((x % 360) / 360.0)
-            backlight.set_graph(abs(math.sin(x / 100.0)))
             time.sleep(DotHatGadget.ANIM_INTERVAL_SECONDS)
             elapsed_time += DotHatGadget.ANIM_INTERVAL_SECONDS
-        self.clear_build_indicators()
+        self.clear_indicators()
         self.set_background_status(BackgroundStatus.Info)
 
 
@@ -40,13 +39,13 @@ class DotHatGadget(GadgetBase):
             lcd.set_cursor_position(0, i)
             lcd.write(lines[i][:DotHatGadget.NUM_COLS])
 
-    def set_build_indicator(self, i, status):
+    def set_indicator(self, i, status):
         if status == IndicatorStatus.On:
             backlight.graph_set_led_state(i, 1)
         else:
             backlight.graph_set_led_state(i, 0)
 
-    def clear_build_indicators(self):
+    def clear_indicators(self):
         backlight.graph_off()
 
     def set_background_status(self, status):
