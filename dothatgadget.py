@@ -20,6 +20,7 @@ class DotHatGadget(GadgetBase):
         super(DotHatGadget, self).__init__()
 
     def display_boot_animation(self, anim_time=10.0):
+        self.clear_indicators()
         elapsed_time = 0.0
         x = 0
         while True:
@@ -29,9 +30,7 @@ class DotHatGadget(GadgetBase):
             backlight.sweep((x % 360) / 360.0)
             time.sleep(DotHatGadget.ANIM_INTERVAL_SECONDS)
             elapsed_time += DotHatGadget.ANIM_INTERVAL_SECONDS
-        self.clear_indicators()
         self.set_background_status(BackgroundStatus.Info)
-
 
     def set_status_lines(self, lines):
         lcd.clear()
