@@ -34,6 +34,7 @@ class Configuration(object):
             requests.packages.urllib3.disable_warnings()  # requests uses a bundled urllib3 module
         self.network_interface_name = config_json.get('networkInterfaceName', None)
         self.display_update_interval = config_json.get('displayUpdateInterval', 5.0)
+        self.delta_time_step = config_json.get('deltaTimeStep', 30)
         self.username = config_json.get('username', None)
         self.auth_token = config_json.get('authToken', None)
 
@@ -45,12 +46,13 @@ class ViewState(object):
 
 
 class RenderThread(threading.Thread):
-    def __init__(self, gadget, update_interval):
+    def __init__(self, gadget, update_interval, delta_time_step):
         super(RenderThread, self).__init__()
         self.setDaemon(True)
         self.__view_state = None
         self.gadget = gadget
-        self.update_interval = update_interval;
+        self.update_interval = update_interval
+        self.delta_time_step = delta_time_step
 
     def run(self):
         while True:
@@ -124,11 +126,11 @@ class RenderThread(threading.Thread):
         now_datetime = datetime.datetime.now()
         timedelta = now_datetime - last_update
         dt_seconds = timedelta.seconds
-        if dt_seconds < 30:
+        if dt_seconds < self.delta_time_step:
             return "Just now!"
         else:
-            # count up in 30 second intervals to be less busy
-            return "%d seconds ago" % ((timedelta.seconds/30)*30)
+            # count up in 30 second intervals (default) to be less busy
+            return "%d seconds ago" % ((timedelta.seconds/self.delta_time_step)*self.delta_time_step)
 
     def render_no_data(self):
         self.gadget.set_background_status(gadget.BackgroundStatus.Info)
@@ -148,7 +150,7 @@ class Controller(object):
             logging.warn('Not running on RaspberryPi, using dummy hardware')
             self.gadget = gadget.GadgetBase()
         logging.info("Instantiated gadget: %s", type(self.gadget))
-        self.render_thread = RenderThread(self.gadget, config.display_update_interval)
+        self.render_thread = RenderThread(self.gadget, config.display_update_interval, config.delta_time_step)
 
     def run_blocking(self):
         self.render_thread.start()
