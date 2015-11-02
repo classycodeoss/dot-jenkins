@@ -24,7 +24,7 @@ class Configuration(object):
         config_fd.close()
         self.view_url = config_json['viewUrl']
         logging.info("Using view at: %s", self.view_url)
-        self.view_refresh_interval = config_json.get('viewRefreshInterval', 10)
+        self.view_refresh_interval = config_json.get('viewRefreshInterval', 30)
         logging.info("Using view refresh interval: %d", self.view_refresh_interval)
         self.view_refresh_error_interval = config_json.get('viewRefreshErrorInterval', 60)
         logging.info("Using view refresh error interval: %d", self.view_refresh_interval)
@@ -34,7 +34,7 @@ class Configuration(object):
             requests.packages.urllib3.disable_warnings()  # requests uses a bundled urllib3 module
         self.network_interface_name = config_json.get('networkInterfaceName', None)
         self.display_update_interval = config_json.get('displayUpdateInterval', 5.0)
-        self.delta_time_step = config_json.get('deltaTimeStep', 30)
+        self.delta_time_step = config_json.get('deltaTimeStep', 10)
         self.username = config_json.get('username', None)
         self.auth_token = config_json.get('authToken', None)
 
