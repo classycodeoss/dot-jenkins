@@ -3,6 +3,8 @@
 dot-jenkins is a python tool that visualizes a Jenkins view using a Pimoroni Display-O-Tron
 (see: https://shop.pimoroni.com/collections/raspberry-pi/products/display-o-tron-hat)
 
+![Photo](https://raw.githubusercontent.com/suzukieng/dot-jenkins/master/docs/dot-jenkins.jpg)
+
 The default behavior is to display the number of succeeding (S), unstable (U) and failed (F) jobs in the view on the LCD. The LCD backlight is green if all jobs are succeeding and adjust to yellow and red if there are failed or unstable jobs. If there are failed or unstable jobs, they are shown one after the other.
 
 Sample LCD outpuD:
