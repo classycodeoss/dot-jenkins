@@ -3,6 +3,19 @@
 dot-jenkins is a python tool that visualizes a Jenkins view using a Pimoroni Display-O-Tron
 (see: https://shop.pimoroni.com/collections/raspberry-pi/products/display-o-tron-hat)
 
+The default behavior is to display the number of succeeding (S), unstable (U) and failed (F) jobs in the view on the LCD. The LCD backlight is green if all jobs are succeeding and adjust to yellow and red if there are failed or unstable jobs. If there are failed or unstable jobs, they are shown one after the other.
+
+Sample LCD outpuD:
+```
+myview
+S/U/F: 3/0/2
+10 seconds ago
+```
+
+The top three LEDs on the Display-O-Tron are used to convey the same information in a different fashion. All three LEDs lighting up means everything is ok, two of them means there are unstable jobs, and if only one is lighting up it means you have failing jobs.
+
+The bottom three LEDs are currently unused and are waiting for interesting stuff to display. I'm open to suggestions. :-)
+
 # Preparing your RasperryPi
 
 To get started, make sure you have set up the Display-O-Tron dependencies correctly using the Pimoroni scripts, see: https://github.com/pimoroni/dot3k
@@ -65,4 +78,7 @@ python controller.py -c my-config.cfg --debug
 
 To automate this, a supervisord configuration is located in the the ```etc``` subdirectory. The configuration assumed that dot-jenkins was installed using the Ansible playbook, and is located in ```/opt/dot-jenkins``` and gets its configuration from ```/etc/dot-jenkins.cfg```
 
+# Developing
+
+The project includes a hardware fake, and uses it instead of relying on a RasperryPi and Display-O-Tron to be available. The hardware fake is used automatically if the ```controller.py``` scripts detects that it is *not* running on a RaspberryPi.
 
