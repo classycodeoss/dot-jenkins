@@ -58,13 +58,13 @@ The table below shows all possible configuration properties with their meaning a
 
 | Configuration Parameter | Description | Default Value |
 | ----------------------- | :----------- | :------------- |
-| ```viewUrl``` | The URL of the Jenkins view (JSON API) | _<none>_ |
-| ```username``` | The username to use when authenticating with Jenkins. Leave unspecified if you do not want or need to use authentication. | _<none>_ |
-| ```authToken``` | The authentication token (= password) to use when authenticating with Jenkins. Leave unspecified if you do not want or need to use authentication. | _<none>_ |
+| ```viewUrl``` | The URL of the Jenkins view (JSON API) | _none_ |
+| ```username``` | The username to use when authenticating with Jenkins. Leave unspecified if you do not want or need to use authentication. | _none_ |
+| ```authToken``` | The authentication token (= password) to use when authenticating with Jenkins. Leave unspecified if you do not want or need to use authentication. | _none_ |
 | ```viewRefreshInterval``` | The duration in seconds between refreshes of the Jenkins view | ```30``` |
-| ```viewRefreshErrorInterval``` | The duration in seconds between refreshes of the Jenkins view, in case an error happened | 60 |
+| ```viewRefreshErrorInterval``` | The duration in seconds between refreshes of the Jenkins view, in case an error happened | ```60``` |
 | ```sslVerifyCertificates``` | In case of HTTPS, indicate whether SSL certificate verification should take place. Set this to ```false``` if you are using a self-signed certificate, or a certificate from an untrusted CA. | ```true``` |
-| ```networkInterfaceName``` | The name of the network interface to use when displaying the device's IP address. | ```wlan0``` |
+| ```networkInterfaceName``` | The name of the network interface to use when displaying the device's IP address. | ```"wlan0"``` |
 | ```displayUpdateInterval``` | The duration in seconds between display refreshes | ```5.0``` |
 | ```deltaTimeStep``` | The increment in seconds to use when displaying the ```XX seconds ago``` information. | ```10``` |
 
