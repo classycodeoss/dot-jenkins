@@ -3,7 +3,7 @@ import logging
 import datetime
 
 class BuildResult:
-    Failure, Unstable, Success, Other = range(4)
+    Failure, Unstable, Success, NotBuilt, Other = range(5)
 
 
 class Build(object):
@@ -17,6 +17,8 @@ class Build(object):
             self.result = BuildResult.Failure
         elif json_obj['result'] == 'UNSTABLE':
             self.result = BuildResult.Unstable
+        elif json_obj['result'] == 'NOT_BUILT':
+            self.result = BuildResult.NotBuilt
         else:
             self.result = BuildResult.Other
         self.number = json_obj['number']
@@ -100,7 +102,7 @@ class View(object):
                       [(job, self.last_build_for_job.get(job.url, None)) for job in self.jobs])
 
     def unstable_jobs(self):
-        return filter(lambda x: x[1] is not None and x[1].result == BuildResult.Unstable,
+        return filter(lambda x: x[1] is not None and (x[1].result == BuildResult.Unstable or x[1].result == BuildResult.NotBuilt),
                       [(job, self.last_build_for_job.get(job.url, None)) for job in self.jobs])
 
     def succeeding_jobs(self):
